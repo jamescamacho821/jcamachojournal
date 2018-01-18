@@ -1,0 +1,25 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+
+@model IPagedList<jcamacho_journal.Models.Post>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table class="table">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+        </tr>
+        <tr>
+            <td>
+               
+                @Html.Raw(item.Body)
+            </td>
+        </tr>
+    }
+</table>

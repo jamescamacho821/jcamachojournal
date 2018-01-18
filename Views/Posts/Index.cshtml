@@ -1,0 +1,83 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+
+@model IPagedList<jcamacho_journal.Models.Post>
+
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css">
+@using (Html.BeginForm("Index", "Posts", FormMethod.Get, htmlAttributes: new { @class = "form" }))
+{
+    <div class="controls controls-row search-row">
+        <input id="searchStr" name="searchStr" class="input-block-level" type="text" placeholder="Search">
+        <button id="searchStr" name="searchStr" class="btn btn-success" type="submit">
+            <i class="icon-search"></i>Filter = @ViewBag.Search
+        </button>
+    </div>
+}
+
+@{
+    ViewBag.Title = "Index";
+
+}
+<h2>Blog Entries</h2>
+
+@*Only write the link to create a post if the role is administrator*@
+
+
+
+@if (User.IsInRole("Admin"))
+{
+    @Html.ActionLink("Create blog entry | ", "Create")
+
+}
+
+@Html.ActionLink("Go Home", "../Home")
+
+@{string strBody = "";}
+
+    @foreach (var item in Model)
+    {
+        if (item.MediaURL != null)
+        {
+            <tr><td>
+                <img class="img-responsive" src="@item.MediaURL" alt="" />
+             </td></tr>
+        }
+        <article class="clearfix">
+            <div class="post-date">
+                @Html.DisplayFor(modelItem => item.CreationDate) | <a href=""> </a> <span>@Html.ActionLink("Comments(" + item.Comments.Count() + ")", "../Posts/Details", new { Slug = item.Slug })</span>
+            </div>
+            <h2><a href="post-typography.html">@Html.DisplayFor(modelItem => item.Title)</a></h2>
+            <p>
+                @{strBody = (item.Body);}
+                @Html.Raw(strBody)
+               @* <a class="" href="post-typography.html">Read more</a>*@
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Details", "Details", new { slug = item.Slug }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.ActionLink("Read more", "Details", new { slug = item.Slug })
+                    </td>
+                }
+            </p>
+        </article>
+
+    }
+
+
+<div class="container">
+    <div class="text-center">
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)of @Model.PageCount
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchStr = ViewBag.Search }));
+
+    </div>
+</div>
+
+

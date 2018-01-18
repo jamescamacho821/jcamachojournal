@@ -1,0 +1,16 @@
+﻿@model IEnumerable<jcamacho_journal.Models.Post>
+
+<table class="table">
+    @foreach (var item in Model)
+    {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.Title, "../Posts/Details", new { slug = item.Slug })
+                 
+                </td>
+
+            </tr>
+        
+    }
+</table>
+

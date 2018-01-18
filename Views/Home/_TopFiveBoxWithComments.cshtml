@@ -1,0 +1,22 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+
+@model IEnumerable<jcamacho_journal.Models.Post>
+
+<table class="table">
+    @foreach (var item in Model)
+    {
+        if (item.Comments.Count() > 0)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.ActionLink("Comments(" + item.Comments.Count() + ")", "../Posts/Details", new { Slug = item.Slug })
+            </td>
+           
+        </tr>
+        }
+    }
+</table>

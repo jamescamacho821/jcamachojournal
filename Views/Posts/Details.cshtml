@@ -1,0 +1,107 @@
+﻿@using Microsoft.AspNet.Identity;
+@model jcamacho_journal.Models.Post
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Post</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        @if (Model.MediaURL != null)
+        {
+            <dt>
+                @*URL:*@
+            </dt>
+            <dd>
+                <img class="img-responsive" src="@Model.MediaURL" alt="" />
+            </dd>
+        }
+        
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt class="textarea.form-control">
+           
+            @Html.DisplayNameFor(model => model.Body)
+        </dt>
+
+        <dd class="textarea.form-control">
+            @{string strBody = (@Model.Body).ToString();}
+            @Html.Raw(strBody)
+         @*   @Html.TextAreaFor(model => model.Body)*@
+        </dd>
+
+    </dl>
+    <p>
+    @if (User.IsInRole("Admin") || User.IsInRole("Moderator") )
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id });
+        <span>|</span>
+        @Html.ActionLink("Back to List", "Index");
+    }
+    else
+    {
+            @Html.ActionLink("Back to List", "Index")
+    }
+    </p>
+</div>
+
+<h4 style="margin-bottom:30px;">Comments</h4>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h5 style="margin-bottom:15px;">Leave a Comment</h5>
+
+    using (Html.BeginForm("CommentCreate", "Posts", FormMethod.Post, new { enctype = "Multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="number" name="PostId" value="@Model.Id" hidden />
+        <div class="textarea.control-form">
+            <textarea style="font-size:0.75em; font-family:Calibri; padding-left:8px; padding-right:8px; width:100%;" type="text" name="Body" rows="7" required placeholder="Add a public comment..."></textarea>
+        </div>
+        <div>
+            <input class="btn-sm btn-primary" type="submit" value="Create a Comment" />
+        </div>
+        <hr/>   
+    }
+}
+
+@foreach (var comment in Model.Comments)
+{
+    if (comment != null)
+    {
+        @*<p>@comment.Body - by @comment.Author.FirstName on @comment.Created.ToShortDateString()</p>*@
+
+        <div style="font-weight:bold;" class="post-meta">
+            @Html.DisplayFor(modelcomment => comment.Author.FirstName)
+        </div>
+
+        <div class="textarea.control-form">
+            @Html.DisplayFor(modelcomment => comment.Body)
+        </div>
+
+   		if (User.IsInRole("Admin") || User.IsInRole("Moderator") || 
+            User.Identity.GetUserId() == comment.AuthorId)
+        // author id and user id is going to be the same number
+        {
+           <div style ="font-size:0.75em;">
+               @Html.ActionLink("Edit", "Edit", "Comments", new { id = comment.Id }, null)
+               <span> | </span>
+               @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id }, null)
+               <span> | </span>
+           </div>
+        }
+        <hr/>
+    }
+}
+
+
